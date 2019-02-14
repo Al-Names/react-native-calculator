@@ -4,47 +4,118 @@ import {
   StyleSheet,
   Text,
   View,
-  Button,
   TouchableOpacity
 } from "react-native";
 
 export default class App extends Component {
   constructor() {
-    super(), (this.state = {});
+    super(),
+      (this.state = {
+        resultText: "",
+        calculationText: ""
+      });
+    this.operations = ["C", "+", "-", "*", "/"];
+  }
+
+  calculateResult() {
+    const text = this.state.resultText;
+
+    this.setState({
+      calculationText: eval(text)
+    });
+  }
+  validate() {
+    const text = this.state.resultText;
+    switch (text.slice(-1)) {
+      case "+":
+      case "-":
+      case "*":
+      case "/":
+        return false;
+    }
+    return true;
+  }
+  buttonPressed(text) {
+    if (text == "=") {
+      return this.validate() && this.calculateResult();
+    }
+    this.setState({
+      resultText: this.state.resultText + text
+    });
+  }
+
+  operate(operation) {
+    switch (operation) {
+      case "C":
+        let text = this.state.resultText.split("");
+        text.pop();
+        this.setState({
+          resultText: text.join("")
+        });
+        break;
+
+      case "+":
+
+      case "-":
+
+      case "*":
+
+      case "/":
+        const lastCharacter = this.state.resultText.split("").pop();
+        if (this.operations.indexOf(lastCharacter) > 0) return;
+
+        if (this.state.text == "") return;
+        this.setState({
+          resultText: this.state.resultText + operation
+        });
+    }
   }
 
   render() {
     let rows = [];
-    let nums = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [0, 0, "="]];
+    let nums = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [".", 0, "="]];
     for (let i = 0; i < 4; i++) {
       let row = [];
 
       for (let j = 0; j < 3; j++) {
         row.push(
-          <TouchableOpacity style={styles.btn}>
+          <TouchableOpacity
+            key={nums[i][j]}
+            onPress={() => this.buttonPressed(nums[i][j])}
+            style={styles.btn}
+          >
             <Text style={styles.btnText}>{nums[i][j]}</Text>
           </TouchableOpacity>
         );
       }
-      rows.push(<View style={styles.row}>{row}</View>);
+      rows.push(
+        <View key={i} style={styles.row}>
+          {row}
+        </View>
+      );
     }
 
-    let operations = ["+", "-", "*", "/"];
     let ops = [];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 5; i++) {
       ops.push(
-        <TouchableOpacity style={styles.btn}>
-          <Text style={styles.opsText}>{operations[i]}</Text>
+        <TouchableOpacity
+          key={this.operations[i]}
+          style={styles.btn}
+          onPress={() => this.operate(this.operations[i])}
+        >
+          <Text style={styles.opsText}>{this.operations[i]}</Text>
         </TouchableOpacity>
       );
     }
     return (
       <View style={styles.container}>
         <View style={styles.result}>
-          <Text style={styles.resultText}>22</Text>
+          <Text style={styles.resultText}>{this.state.resultText}</Text>
         </View>
         <View style={styles.calculation}>
-          <Text style={styles.calculationText}>11+11</Text>
+          <Text style={styles.calculationText}>
+            {this.state.calculationText}
+          </Text>
         </View>
         <View style={styles.buttons}>
           <View style={styles.numbers}>{rows}</View>
@@ -61,17 +132,17 @@ const styles = StyleSheet.create({
   },
   result: {
     flex: 2,
-    backgroundColor: "red",
+    backgroundColor: "white",
     justifyContent: "center",
     alignItems: "flex-end"
   },
   resultText: {
     fontSize: 30,
-    color: "white"
+    color: "#484855"
   },
   calculation: {
     flex: 1,
-    backgroundColor: "green",
+    backgroundColor: "grey",
     justifyContent: "center",
     alignItems: "flex-end"
   },
@@ -90,7 +161,8 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   btnText: {
-    fontSize: 30
+    fontSize: 30,
+    color: "white"
   },
   row: {
     flexDirection: "row",
@@ -100,15 +172,15 @@ const styles = StyleSheet.create({
   },
   numbers: {
     flex: 3,
-    backgroundColor: "yellow"
+    backgroundColor: "#484855"
   },
   operations: {
     flex: 1,
     justifyContent: "space-around",
-    backgroundColor: "black"
+    backgroundColor: "#434343"
   },
   opsText: {
     fontSize: 30,
-    color: "blue"
+    color: "white"
   }
 });
